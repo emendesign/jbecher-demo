@@ -115,6 +115,131 @@
   .ad-desc { font-size: 12px; color: #475569; margin-top: 2px; line-height: 1.4; }
   .tier-bar { display: flex; height: 28px; border-radius: 6px; overflow: hidden; }
   .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+  /* Roadmap section */
+  .roadmap-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .roadmap-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.12);
+  }
+  .roadmap-card .rc-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .phase-badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .phase-badge.phase-2 {
+    background: rgba(13, 148, 136, 0.12);
+    color: #0D9488;
+    border: 1px solid rgba(13, 148, 136, 0.3);
+  }
+  .phase-badge.phase-3 {
+    background: rgba(17, 27, 46, 0.08);
+    color: var(--navy);
+    border: 1px solid rgba(17, 27, 46, 0.2);
+  }
+  .rc-eta {
+    font-size: 11px;
+    color: #94A3B8;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  .roadmap-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.3;
+  }
+  .roadmap-card .rc-desc {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.55;
+    margin-top: 6px;
+  }
+  .mock-frame {
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: #F8FAFC;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .faq-q {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.4;
+  }
+  .faq-a {
+    font-size: 12.5px;
+    color: #475569;
+    line-height: 1.6;
+    margin-top: 6px;
+  }
+  .gbp-header {
+    display: flex; align-items: center; gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .gbp-logo {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--orange);
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .gbp-name { font-size: 13px; font-weight: 700; color: var(--navy); }
+  .gbp-date { font-size: 11px; color: #94A3B8; }
+  .gbp-body {
+    font-size: 12.5px; color: #334155;
+    line-height: 1.6; padding-top: 10px;
+  }
+  .star-row {
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  }
+  .stars { color: #F59E0B; font-size: 22px; letter-spacing: 2px; }
+  .rating-num { font-size: 22px; font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; }
+  .rating-count { font-size: 12px; color: #64748B; font-weight: 500; }
+  .cert-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: rgba(17, 27, 46, 0.06);
+    color: var(--navy);
+    border: 1px solid rgba(17, 27, 46, 0.15);
+    margin: 3px 4px 3px 0;
+  }
+  .cert-chip .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--orange); }
+  .code-mini {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: #0E1726;
+    color: #E2E8F0;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10.5px;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .code-mini .k { color: #94A3B8; }
+  .code-mini .s { color: #FBE7D6; }
+  .code-mini .n { color: #F59E0B; }
 </style>
 </head>
 <body class="text-slate-900">
@@ -146,6 +271,7 @@
     <a href="#relationships" class="hover:text-white">GC Relationships</a>
     <a href="#sectors" class="hover:text-white">Sector Mix</a>
     <a href="#geo" class="hover:text-white">Geographic Coverage</a>
+    <a href="#roadmap" class="hover:text-white">Roadmap</a>
     <a href="/enrichment" class="text-orange hover:text-white font-semibold">How It Works →</a>
     <span class="ml-auto text-slate-500">Data window: Jan 2025 — Apr 2026</span>
   </div>
@@ -554,6 +680,120 @@
     </div>
     <div style="height: 300px;">
       <canvas id="countyChart"></canvas>
+    </div>
+  </section>
+
+  <!-- PANEL 6: ROADMAP -->
+  <section id="roadmap">
+    <div class="flex items-end justify-between mb-4">
+      <div>
+        <h2 class="text-2xl font-bold text-navy">Platform Roadmap — Beyond Project Pages</h2>
+        <p class="text-sm text-slate-500 mt-1 max-w-2xl">Phase 1 enriches every permit into a discoverable project page. Phase 2 and 3 multiply that signal across the surfaces AI search actually reads — FAQs, Google Business, reviews, and credentials.</p>
+      </div>
+      <span class="pill">Phase 2 &amp; 3</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+      <!-- FAQ Engine -->
+      <div class="roadmap-card">
+        <div class="rc-head">
+          <span class="phase-badge phase-2">Phase 2</span>
+          <span class="rc-eta">Targeted Q3 2026</span>
+        </div>
+        <h3>FAQ Engine</h3>
+        <p class="rc-desc">Auto-generated FAQ pages from permit categories, marked up with <span class="font-mono text-xs text-navy">FAQPage</span> schema — the structure LLM search tools like Perplexity and Google SGE pull from when answering category-level questions.</p>
+        <div class="mock-frame">
+          <div class="faq-q">Q. What does an EV charger installation cost in the Twin Cities?</div>
+          <p class="faq-a">A typical Level 2 charger install for a single-family home in the Minneapolis–St Paul metro runs $1,800–$3,500 depending on panel capacity and circuit run distance. J Becher &amp; Associates has handled 213 EV installs across residential, commercial, and multifamily sites...</p>
+          <div class="code-mini"><span class="k">{</span> <span class="k">"@type":</span> <span class="s">"FAQPage"</span>,
+  <span class="k">"mainEntity":</span> [{
+    <span class="k">"@type":</span> <span class="s">"Question"</span>,
+    <span class="k">"name":</span> <span class="s">"What does an EV charger..."</span>,
+    <span class="k">"acceptedAnswer":</span> { <span class="k">"@type":</span> <span class="s">"Answer"</span>, ... }
+  }] <span class="k">}</span></div>
+        </div>
+      </div>
+
+      <!-- GBP Sync -->
+      <div class="roadmap-card">
+        <div class="rc-head">
+          <span class="phase-badge phase-2">Phase 2</span>
+          <span class="rc-eta">Targeted Q3 2026</span>
+        </div>
+        <h3>Google Business Profile Sync</h3>
+        <p class="rc-desc">Every enriched permit triggers an auto-published GBP update. Most contractors never refresh their profile — this turns 758 permits into 758 fresh activity signals for the local pack and Maps.</p>
+        <div class="mock-frame">
+          <div class="gbp-header">
+            <div class="gbp-logo">JB</div>
+            <div>
+              <div class="gbp-name">J Becher &amp; Associates</div>
+              <div class="gbp-date">Update · 2 days ago · Posted automatically</div>
+            </div>
+          </div>
+          <p class="gbp-body">Now servicing: 120-unit CommonBond Communities apartment &amp; townhome remodel in Oak Park Heights. IBEW Local 292 crews delivering full electrical scope — unit-level service updates, common-area lighting, and code-required upgrades for affordable housing.</p>
+        </div>
+      </div>
+
+      <!-- Review Aggregation -->
+      <div class="roadmap-card">
+        <div class="rc-head">
+          <span class="phase-badge phase-3">Phase 3</span>
+          <span class="rc-eta">Targeted Q1 2027</span>
+        </div>
+        <h3>Review Aggregation</h3>
+        <p class="rc-desc">Centralize Google, BBB, and trade-directory reviews into one rendered block with <span class="font-mono text-xs text-navy">AggregateRating</span> schema. Review density is one of the strongest signals AI search uses when deciding which contractor to cite.</p>
+        <div class="mock-frame">
+          <div class="star-row">
+            <span class="stars">★★★★★</span>
+            <span class="rating-num">4.8</span>
+            <span class="rating-count">based on 127 verified reviews</span>
+          </div>
+          <div class="code-mini"><span class="k">{</span> <span class="k">"@type":</span> <span class="s">"AggregateRating"</span>,
+  <span class="k">"ratingValue":</span> <span class="s">"4.8"</span>,
+  <span class="k">"reviewCount":</span> <span class="n">127</span>,
+  <span class="k">"bestRating":</span> <span class="s">"5"</span> <span class="k">}</span></div>
+        </div>
+      </div>
+
+      <!-- Certification Schema -->
+      <div class="roadmap-card">
+        <div class="rc-head">
+          <span class="phase-badge phase-3">Phase 3</span>
+          <span class="rc-eta">Targeted Q1 2027</span>
+        </div>
+        <h3>Certification &amp; License Schema</h3>
+        <p class="rc-desc">Structured <span class="font-mono text-xs text-navy">hasCredential</span> markup for IBEW Local 292 membership, MN state electrical licensing, OSHA, and EV-installer certifications. These are the trust signals LLMs weigh when deciding who to recommend.</p>
+        <div class="mock-frame">
+          <span class="cert-chip"><span class="dot"></span>IBEW Local 292 · Signatory</span>
+          <span class="cert-chip"><span class="dot"></span>MN State Electrical License</span>
+          <span class="cert-chip"><span class="dot"></span>OSHA 30 Certified</span>
+          <span class="cert-chip"><span class="dot"></span>NABCEP EV Installer</span>
+          <div class="code-mini"><span class="k">"hasCredential":</span> {
+  <span class="k">"@type":</span> <span class="s">"EducationalOccupationalCredential"</span>,
+  <span class="k">"name":</span> <span class="s">"IBEW Local 292 Signatory Contractor"</span>,
+  <span class="k">"recognizedBy":</span> { <span class="k">"@type":</span> <span class="s">"Organization"</span>, ... }
+<span class="k">}</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="mt-5 p-5 rounded-xl bg-navy text-slate-200">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div>
+          <div class="text-xs font-bold text-orange uppercase tracking-wider">Phase 1 — Live</div>
+          <p class="text-sm mt-1.5 leading-relaxed">758 enriched project pages, schema markup, full pipeline. Foundation in place.</p>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-orange uppercase tracking-wider">Phase 2 — FAQ + GBP</div>
+          <p class="text-sm mt-1.5 leading-relaxed">Multiply discoverability through category FAQs and continuous Google Business updates.</p>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-orange uppercase tracking-wider">Phase 3 — Trust Signals</div>
+          <p class="text-sm mt-1.5 leading-relaxed">Review aggregation and credential schema cement J Becher as an AI-citable authority.</p>
+        </div>
+      </div>
     </div>
   </section>
 

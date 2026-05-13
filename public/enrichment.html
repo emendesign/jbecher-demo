@@ -333,6 +333,166 @@
     color: var(--teal);
     font-weight: 800;
   }
+  /* Fan-out diagram */
+  .fanout {
+    position: relative;
+    padding: 8px 0 0;
+  }
+  .fanout-hub {
+    width: max-content;
+    max-width: 380px;
+    margin: 0 auto;
+    background: var(--navy);
+    color: white;
+    padding: 18px 28px;
+    border-radius: 14px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    border: 2px solid var(--orange);
+    box-shadow: 0 10px 30px -12px rgba(232, 108, 27, 0.4);
+  }
+  .fanout-hub .h-tag {
+    font-size: 11px;
+    color: var(--orange);
+    letter-spacing: 0.1em;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .fanout-hub .h-label {
+    font-size: 19px;
+    font-weight: 800;
+    margin-top: 4px;
+    letter-spacing: -0.01em;
+  }
+  .fanout-hub .h-sub {
+    font-size: 11px;
+    color: #94A3B8;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    margin-top: 6px;
+  }
+  .fanout-trunk {
+    position: relative;
+    height: 50px;
+    margin: 0 auto;
+    max-width: 92%;
+  }
+  .fanout-trunk::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 2px; height: 28px;
+    background: var(--orange);
+  }
+  .fanout-trunk::after {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 8.33%;
+    right: 8.33%;
+    height: 2px;
+    background: var(--orange);
+  }
+  .fanout-leaves {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    position: relative;
+  }
+  .leaf {
+    position: relative;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 12px 14px;
+    text-align: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .leaf:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px -10px rgba(15, 23, 42, 0.16);
+  }
+  .leaf::before {
+    content: '';
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 22px;
+    background: var(--orange);
+  }
+  .leaf .leaf-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: var(--orange-soft);
+    color: var(--orange);
+    font-weight: 800;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+  }
+  .leaf.leaf-teal .leaf-icon {
+    background: rgba(13, 148, 136, 0.14);
+    color: var(--teal);
+  }
+  .leaf.leaf-navy .leaf-icon {
+    background: rgba(17, 27, 46, 0.08);
+    color: var(--navy);
+  }
+  .leaf .leaf-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.3;
+  }
+  .leaf .leaf-sub {
+    font-size: 11.5px;
+    color: #64748B;
+    line-height: 1.5;
+    margin-top: 5px;
+  }
+  @media (max-width: 900px) {
+    .fanout-leaves { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .fanout-trunk { display: none; }
+    .fanout-hub { margin-bottom: 20px; }
+    .leaf::before { display: none; }
+  }
+  .multiplier-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+    padding: 20px;
+    background: var(--navy);
+    color: var(--slate-200);
+    border-radius: 14px;
+  }
+  .multiplier-bar .mb-label {
+    font-size: 11px;
+    color: var(--orange);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .multiplier-bar .mb-stat {
+    font-size: 26px;
+    font-weight: 800;
+    color: white;
+    line-height: 1.1;
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .multiplier-bar .mb-desc {
+    font-size: 12.5px;
+    color: #CBD5E1;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  @media (max-width: 800px) { .multiplier-bar { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body class="text-slate-900">
@@ -365,6 +525,7 @@
     <a href="#schema" class="hover:text-white">Schema Markup</a>
     <a href="#ai-search" class="hover:text-white">AI Search Visibility</a>
     <a href="#walkthrough" class="hover:text-white">Single-Record Walkthrough</a>
+    <a href="#ecosystem" class="hover:text-white">Beyond Project Pages</a>
   </div>
 </div>
 
@@ -861,6 +1022,99 @@
           <div class="lbl">rich result</div><div class="val">Eligible — ConstructionProject + LocalBusiness</div>
           <div class="lbl">ai-discoverable</div><div class="val">Yes — cited in synthesized answers for Minneapolis multifamily electrical queries</div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEYOND PROJECT PAGES -->
+  <section id="ecosystem">
+    <div class="flex items-end justify-between mb-5">
+      <div>
+        <h2 class="text-2xl font-bold text-navy">Beyond Project Pages</h2>
+        <p class="text-sm text-slate-500 mt-1 max-w-2xl">One permit record doesn't end at one project page. The platform fans the same source data across six content surfaces — each reinforcing the entity signal that AI search relies on.</p>
+      </div>
+      <span class="pill">Content fan-out</span>
+    </div>
+
+    <div class="card p-6">
+      <div class="fanout">
+        <!-- Hub -->
+        <div class="fanout-hub">
+          <div class="h-tag">1× Source Record</div>
+          <div class="h-label">Permit Record</div>
+          <div class="h-sub">ELE2603-02783</div>
+        </div>
+
+        <!-- Connector trunk -->
+        <div class="fanout-trunk" aria-hidden="true"></div>
+
+        <!-- Leaves -->
+        <div class="fanout-leaves">
+          <div class="leaf">
+            <div class="leaf-icon">P</div>
+            <div class="leaf-title">Project Page</div>
+            <p class="leaf-sub">SEO-optimized, schema-marked permanent URL on the J Becher site.</p>
+          </div>
+          <div class="leaf leaf-teal">
+            <div class="leaf-icon">?</div>
+            <div class="leaf-title">FAQ Generation</div>
+            <p class="leaf-sub">Permit categories feed auto-generated FAQs marked with FAQPage schema.</p>
+          </div>
+          <div class="leaf">
+            <div class="leaf-icon">G</div>
+            <div class="leaf-title">GBP Posts</div>
+            <p class="leaf-sub">Google Business Profile update auto-published for every enriched record.</p>
+          </div>
+          <div class="leaf leaf-navy">
+            <div class="leaf-icon">S</div>
+            <div class="leaf-title">Social Content</div>
+            <p class="leaf-sub">LinkedIn &amp; Facebook posts drafted from project headline + ad copy.</p>
+          </div>
+          <div class="leaf leaf-teal">
+            <div class="leaf-icon">★</div>
+            <div class="leaf-title">Review Requests</div>
+            <p class="leaf-sub">Triggered to the GC contact once project status flips to complete.</p>
+          </div>
+          <div class="leaf">
+            <div class="leaf-icon">$</div>
+            <div class="leaf-title">Ad Copy</div>
+            <p class="leaf-sub">Search-ad headlines &amp; descriptions packaged for Google Ads campaigns.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multiplier bar -->
+    <div class="multiplier-bar">
+      <div>
+        <div class="mb-label">Source records</div>
+        <div class="mb-stat">758</div>
+        <div class="mb-desc">Permits enriched in the current data window.</div>
+      </div>
+      <div>
+        <div class="mb-label">Content surfaces per record</div>
+        <div class="mb-stat">6×</div>
+        <div class="mb-desc">Project page, FAQ, GBP, social, review touch, ad copy.</div>
+      </div>
+      <div>
+        <div class="mb-label">Total discoverable assets</div>
+        <div class="mb-stat">~4,500</div>
+        <div class="mb-desc">Schema-marked outputs feeding classic and AI search from a single permit feed.</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-6">
+      <div class="card p-5">
+        <div class="panel-title mb-1.5">The compounding logic</div>
+        <p class="text-sm text-slate-600 leading-relaxed">Every additional surface that references the same entity — J Becher, IBEW Local 292, this address, this scope — strengthens the confidence signal AI search uses when picking which contractor to cite in a generated answer.</p>
+      </div>
+      <div class="card p-5">
+        <div class="panel-title mb-1.5">The ROI shift</div>
+        <p class="text-sm text-slate-600 leading-relaxed">A single permit fee of $1,282 used to produce zero marketing assets. The platform now turns that same row into six discoverable outputs, each independently feeding the entity graph that powers the local pack, Maps, and AI answers.</p>
+      </div>
+      <div class="card p-5">
+        <div class="panel-title mb-1.5">Source remains canonical</div>
+        <p class="text-sm text-slate-600 leading-relaxed">Every fan-out asset references the underlying permit record. If a fact changes — unit count, GC, address — the platform regenerates the dependent surfaces. Nothing drifts.</p>
       </div>
     </div>
   </section>
