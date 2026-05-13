@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>How It Works — Permit Enrichment Pipeline | J Becher &amp; Associates</title>
-<meta name="description" content="The enrichment pipeline behind the J Becher portal — raw permit feed, classification, Claude API enrichment, schema.org structured data, and WordPress publishing. Built for AI search visibility." />
+<meta name="description" content="The enrichment pipeline behind the J Becher portal — raw permit feed, classification, intelligent content enrichment, schema.org structured data, and WordPress publishing. Built for AI search visibility." />
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -378,12 +378,12 @@
         From a state permit row to the answer in an AI search.
       </h1>
       <p class="text-base text-slate-600 mt-4 max-w-2xl leading-relaxed">
-        Public permit feeds are noisy, unstructured, and invisible to search engines. The J Becher portal runs every record through a five-stage pipeline — classifying scope, enriching with Claude, attaching <span class="font-semibold text-navy">schema.org structured data</span>, and publishing as a branded, AI-discoverable project page on WordPress. The goal isn't just SEO. It's appearing as the cited contractor when someone asks Perplexity, ChatGPT, Google SGE, or Bing Copilot "who handles multifamily electrical in Hennepin County?"
+        Public permit feeds are noisy, unstructured, and invisible to search engines. The J Becher portal runs every record through a five-stage intelligence pipeline — classifying scope, enriching content, attaching <span class="font-semibold text-navy">schema.org structured data</span>, and publishing as a branded, AI-discoverable project page on WordPress. The goal isn't just SEO. It's appearing as the cited contractor when someone asks Perplexity, ChatGPT, Google SGE, or Bing Copilot "who handles multifamily electrical in Hennepin County?"
       </p>
       <div class="flex flex-wrap gap-2 mt-5">
         <span class="pill">758 permits enriched</span>
         <span class="pill pill-teal">JSON-LD on every page</span>
-        <span class="pill pill-navy">Claude-powered copy</span>
+        <span class="pill pill-navy">Platform-enriched copy</span>
       </div>
     </div>
     <div class="lg:col-span-5">
@@ -431,8 +431,8 @@
       </div>
       <div class="pipeline-step is-ai">
         <div class="step-num">3</div>
-        <div class="step-title">AI Enrichment</div>
-        <div class="step-sub">Claude generates SEO copy, headlines, ad descriptions, and project narratives.</div>
+        <div class="step-title">Content Enrichment</div>
+        <div class="step-sub">The intelligence platform generates SEO copy, headlines, ad descriptions, and project narratives.</div>
         <div class="step-io">
           <div><span class="lbl">In:</span> tier + row</div>
           <div><span class="lbl">Out:</span> structured copy</div>
@@ -511,7 +511,7 @@
         <div class="num">2</div>
         <div>
           <div class="text-base font-bold text-navy">Classification — Skip / Light / Full</div>
-          <div class="text-xs text-slate-500 mt-0.5">Triage every row so Claude only sees the records worth narrating.</div>
+          <div class="text-xs text-slate-500 mt-0.5">Triage every row so the enrichment engine only sees the records worth narrating.</div>
         </div>
       </div>
       <div class="stage-body grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -525,7 +525,7 @@
         </div>
         <div>
           <div class="badge-row mb-2"><span class="badge badge-full">enrich_full</span></div>
-          <p class="text-sm text-slate-600 leading-relaxed">Multifamily, healthcare, large commercial, marquee GC partnerships. Full Claude treatment: headline, body, ad preview, tags, and complete <span class="font-mono text-xs">ConstructionProject</span> schema.</p>
+          <p class="text-sm text-slate-600 leading-relaxed">Multifamily, healthcare, large commercial, marquee GC partnerships. Full enrichment treatment: headline, body, ad preview, tags, and complete <span class="font-mono text-xs">ConstructionProject</span> schema.</p>
         </div>
       </div>
       <div class="stage-body pt-0">
@@ -546,18 +546,18 @@
       <div class="stage-head">
         <div class="num">3</div>
         <div>
-          <div class="text-base font-bold text-navy">AI Enrichment — Claude API</div>
-          <div class="text-xs text-slate-500 mt-0.5">A single Claude call returns a typed, schema-validated copy block.</div>
+          <div class="text-base font-bold text-navy">Content Enrichment — Intelligence Engine</div>
+          <div class="text-xs text-slate-500 mt-0.5">The platform returns a typed, schema-validated copy block per record.</div>
         </div>
       </div>
       <div class="stage-body grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
-          <div class="panel-title mb-2">Why Claude, and why structured output</div>
-          <p class="text-sm text-slate-600 leading-relaxed">The model is asked for a strict JSON object with named fields — <span class="font-mono text-xs">headline</span>, <span class="font-mono text-xs">body</span>, <span class="font-mono text-xs">tags</span>, <span class="font-mono text-xs">ad_title</span>, <span class="font-mono text-xs">ad_desc</span>. Structured output is enforced by a tool-use schema, so the response is never free-form prose that has to be parsed. If the model returns a malformed field, the row is retried with a stricter prompt or routed to manual review.</p>
-          <p class="text-sm text-slate-600 leading-relaxed mt-3">The prompt includes J Becher's brand voice (union-trained, IBEW Local 292 signatory, Twin Cities multifamily depth) and forbids hallucinated facts — Claude only narrates what's in the row.</p>
+          <div class="panel-title mb-2">Inside the enrichment engine</div>
+          <p class="text-sm text-slate-600 leading-relaxed">Each record produces a strict JSON object with named fields — <span class="font-mono text-xs">headline</span>, <span class="font-mono text-xs">body</span>, <span class="font-mono text-xs">tags</span>, <span class="font-mono text-xs">ad_title</span>, <span class="font-mono text-xs">ad_desc</span>. Structured output is enforced by a typed schema, so the response is never free-form prose that has to be parsed. Malformed fields are retried with tighter constraints or routed to manual review.</p>
+          <p class="text-sm text-slate-600 leading-relaxed mt-3">The engine is tuned to J Becher's brand voice — union-trained, IBEW Local 292 signatory, Twin Cities multifamily depth — and constrained to only narrate facts present in the source row, never invent them.</p>
         </div>
         <div>
-          <div class="panel-title mb-2">Claude output (validated JSON)</div>
+          <div class="panel-title mb-2">Engine output (validated JSON)</div>
           <div class="code-card"><span class="k">{</span>
   <span class="k">"headline":</span> <span class="s">"10-Unit Townhome with 800A
               Service — Frerichs Construction"</span>,
@@ -647,7 +647,7 @@
       </div>
       <div class="stage-body grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
-          <p class="text-sm text-slate-600 leading-relaxed">Each enriched record becomes a project page on the J Becher WordPress site. The page includes the Claude-generated body, the project tags as filterable categories, the JSON-LD schema in the page head, and an Open Graph / Twitter card for social previews.</p>
+          <p class="text-sm text-slate-600 leading-relaxed">Each enriched record becomes a project page on the J Becher WordPress site. The page includes the platform-generated body, the project tags as filterable categories, the JSON-LD schema in the page head, and an Open Graph / Twitter card for social previews.</p>
           <p class="text-sm text-slate-600 leading-relaxed mt-3">On publish, three things happen in parallel:</p>
           <ul class="checklist mt-2">
             <li>Sitemap entry added and submitted to Google &amp; Bing</li>
@@ -810,7 +810,7 @@
       <div class="card p-5">
         <div class="flex items-center gap-3 mb-3">
           <div class="w-8 h-8 rounded-md bg-orange text-white flex items-center justify-center text-xs font-bold">3</div>
-          <div class="text-sm font-bold text-navy">Claude enrichment</div>
+          <div class="text-sm font-bold text-navy">Content enrichment</div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
