@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How It Works — Permit Enrichment Pipeline | J Becher &amp; Associates</title>
+<meta name="description" content="The enrichment pipeline behind the J Becher portal — raw permit feed, classification, Claude API enrichment, schema.org structured data, and WordPress publishing. Built for AI search visibility." />
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #111B2E;
+    --navy-2: #1A2740;
+    --orange: #E86C1B;
+    --orange-soft: #FBE7D6;
+    --teal: #0D9488;
+    --ink: #0F172A;
+    --muted: #64748B;
+    --line: #E5E7EB;
+    --bg: #F6F7F9;
+  }
+  html, body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--ink); }
+  .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .text-navy { color: var(--navy); }
+  .bg-navy { background-color: var(--navy); }
+  .bg-navy-2 { background-color: var(--navy-2); }
+  .text-orange { color: var(--orange); }
+  .bg-orange { background-color: var(--orange); }
+  .border-orange { border-color: var(--orange); }
+  .text-teal { color: var(--teal); }
+  .bg-teal { background-color: var(--teal); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; }
+  .panel-title { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(232, 108, 27, 0.12);
+    color: var(--orange);
+    border: 1px solid rgba(232, 108, 27, 0.3);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pill-teal {
+    background: rgba(13, 148, 136, 0.12);
+    color: var(--teal);
+    border-color: rgba(13, 148, 136, 0.3);
+  }
+  .pill-navy {
+    background: rgba(17, 27, 46, 0.08);
+    color: var(--navy);
+    border-color: rgba(17, 27, 46, 0.2);
+  }
+  /* Pipeline stepper */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    position: relative;
+  }
+  .pipeline-step {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 16px;
+    position: relative;
+    transition: transform 0.15s ease;
+  }
+  .pipeline-step:hover { transform: translateY(-2px); }
+  .pipeline-step .step-num {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--navy);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .pipeline-step.is-ai .step-num { background: var(--orange); }
+  .pipeline-step .step-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.3;
+  }
+  .pipeline-step .step-sub {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.45;
+  }
+  .pipeline-step .step-io {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed #E2E8F0;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10.5px;
+    color: #64748B;
+    line-height: 1.5;
+  }
+  .pipeline-step .step-io .lbl {
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 9.5px;
+  }
+  .pipeline-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--orange);
+    font-weight: 800;
+    font-size: 16px;
+    pointer-events: none;
+  }
+  @media (max-width: 1000px) {
+    .pipeline { grid-template-columns: 1fr; }
+    .pipeline-arrow { display: none; }
+  }
+  .code-card {
+    background: #0E1726;
+    color: #E2E8F0;
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+  .code-card .k { color: #94A3B8; }
+  .code-card .s { color: #FBE7D6; }
+  .code-card .n { color: #F59E0B; }
+  .code-card .c { color: #64748B; font-style: italic; }
+  .code-card .t { color: #0EA5A0; }
+  .raw-card {
+    background: #F4F5F7;
+    border: 1px dashed #C9CED6;
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.55;
+    color: #475569;
+    white-space: pre-wrap;
+  }
+  .raw-card .k { color: #94A3B8; }
+  .stage-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .stage-card .stage-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    background: #FAFBFC;
+  }
+  .stage-card .stage-head .num {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--navy);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .stage-card.is-ai .stage-head .num { background: var(--orange); }
+  .stage-card.is-schema .stage-head .num { background: var(--teal); }
+  .stage-card .stage-body { padding: 20px; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .badge-skip { background: #E2E8F0; color: #334155; }
+  .badge-light { background: #E4ECF7; color: #1E3A8A; }
+  .badge-full { background: var(--orange-soft); color: #A0470F; }
+  .schema-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 800px) { .schema-list { grid-template-columns: 1fr; } }
+  .schema-tile {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    background: #fff;
+  }
+  .schema-tile .tname {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--teal);
+  }
+  .schema-tile .tdesc {
+    font-size: 12.5px;
+    color: #475569;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .ai-answer {
+    background: linear-gradient(180deg, #FFFFFF 0%, #FDF7F2 100%);
+    border: 1px solid #F0D5BD;
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .ai-answer .ai-q {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+  }
+  .ai-answer .ai-prompt {
+    font-size: 15px;
+    color: var(--navy);
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .ai-answer .ai-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 3px 10px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .ai-answer .ai-body {
+    font-size: 14px;
+    color: #1F2937;
+    line-height: 1.65;
+    margin-top: 10px;
+  }
+  .ai-answer .ai-cite {
+    color: var(--orange);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px) { .why-grid { grid-template-columns: 1fr; } }
+  .why-item {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    background: #fff;
+  }
+  .why-item .icon-wrap {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: var(--orange-soft);
+    color: var(--orange);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+  }
+  .why-item h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-top: 10px;
+  }
+  .why-item p {
+    font-size: 13px;
+    color: #475569;
+    margin-top: 4px;
+    line-height: 1.55;
+  }
+  .kv {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 8px;
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+  .kv .lbl {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    color: #94A3B8;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+  .kv .val { color: #1F2937; }
+  .arrow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+    color: var(--orange);
+    font-weight: 800;
+  }
+  .checklist li {
+    position: relative;
+    padding-left: 24px;
+    font-size: 13.5px;
+    color: #1F2937;
+    line-height: 1.6;
+    margin-top: 8px;
+  }
+  .checklist li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--teal);
+    font-weight: 800;
+  }
+</style>
+</head>
+<body class="text-slate-900">
+
+<!-- HEADER -->
+<header class="bg-navy text-white">
+  <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a href="/" class="w-11 h-11 rounded-lg bg-orange flex items-center justify-center font-bold text-xl">JB</a>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight">J Becher &amp; Associates</h1>
+        <p class="text-xs text-slate-300 mt-0.5">Contractor Visibility Portal — Powered by <a href="https://www.emendesign.com" class="text-orange hover:underline">Em En Design</a></p>
+      </div>
+    </div>
+    <div class="hidden md:flex items-center gap-3 text-xs text-slate-300">
+      <span class="pill">How It Works</span>
+      <span>IBEW Local 292</span>
+      <span class="text-slate-500">•</span>
+      <span>Twin Cities, MN</span>
+    </div>
+  </div>
+</header>
+
+<!-- SUBNAV -->
+<div class="bg-navy-2 text-slate-300 border-b border-slate-800">
+  <div class="max-w-7xl mx-auto px-6 py-2.5 flex items-center gap-6 text-xs font-medium overflow-x-auto">
+    <a href="/" class="hover:text-white">← Back to Dashboard</a>
+    <a href="#pipeline" class="text-white border-b-2 border-orange pb-1">Pipeline</a>
+    <a href="#stages" class="hover:text-white">Stage Walkthrough</a>
+    <a href="#schema" class="hover:text-white">Schema Markup</a>
+    <a href="#ai-search" class="hover:text-white">AI Search Visibility</a>
+    <a href="#walkthrough" class="hover:text-white">Single-Record Walkthrough</a>
+  </div>
+</div>
+
+<main class="max-w-7xl mx-auto px-6 py-10 space-y-12">
+
+  <!-- HERO -->
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div class="lg:col-span-7">
+      <span class="pill pill-navy mb-3">Enrichment Pipeline</span>
+      <h1 class="text-4xl lg:text-5xl font-extrabold text-navy tracking-tight leading-[1.05] mt-3">
+        From a state permit row to the answer in an AI search.
+      </h1>
+      <p class="text-base text-slate-600 mt-4 max-w-2xl leading-relaxed">
+        Public permit feeds are noisy, unstructured, and invisible to search engines. The J Becher portal runs every record through a five-stage pipeline — classifying scope, enriching with Claude, attaching <span class="font-semibold text-navy">schema.org structured data</span>, and publishing as a branded, AI-discoverable project page on WordPress. The goal isn't just SEO. It's appearing as the cited contractor when someone asks Perplexity, ChatGPT, Google SGE, or Bing Copilot "who handles multifamily electrical in Hennepin County?"
+      </p>
+      <div class="flex flex-wrap gap-2 mt-5">
+        <span class="pill">758 permits enriched</span>
+        <span class="pill pill-teal">JSON-LD on every page</span>
+        <span class="pill pill-navy">Claude-powered copy</span>
+      </div>
+    </div>
+    <div class="lg:col-span-5">
+      <div class="card p-5">
+        <div class="panel-title">What you'll see on this page</div>
+        <ul class="checklist mt-3">
+          <li>The full 5-stage pipeline diagram</li>
+          <li>Each stage explained — input, transformation, output</li>
+          <li>Why correct schema.org markup is non-negotiable</li>
+          <li>How structured data appears in AI-generated answers</li>
+          <li>A single permit traced end-to-end</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section id="pipeline">
+    <div class="flex items-end justify-between mb-5">
+      <div>
+        <h2 class="text-2xl font-bold text-navy">The Five-Stage Pipeline</h2>
+        <p class="text-sm text-slate-500 mt-1 max-w-2xl">Each permit flows through five distinct stages. Low-signal rows are skipped early; high-signal projects get the full enrichment treatment.</p>
+      </div>
+      <span class="pill">Stage 1 → Stage 5</span>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-num">1</div>
+        <div class="step-title">Raw Permit Ingest</div>
+        <div class="step-sub">State of MN electrical permit feed, normalized into rows.</div>
+        <div class="step-io">
+          <div><span class="lbl">In:</span> CSV / API feed</div>
+          <div><span class="lbl">Out:</span> normalized row</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">2</div>
+        <div class="step-title">Classification</div>
+        <div class="step-sub">Each row tagged as <span class="font-mono">skip</span>, <span class="font-mono">enrich_light</span>, or <span class="font-mono">enrich_full</span>.</div>
+        <div class="step-io">
+          <div><span class="lbl">In:</span> permit row</div>
+          <div><span class="lbl">Out:</span> tier + tags</div>
+        </div>
+      </div>
+      <div class="pipeline-step is-ai">
+        <div class="step-num">3</div>
+        <div class="step-title">AI Enrichment</div>
+        <div class="step-sub">Claude generates SEO copy, headlines, ad descriptions, and project narratives.</div>
+        <div class="step-io">
+          <div><span class="lbl">In:</span> tier + row</div>
+          <div><span class="lbl">Out:</span> structured copy</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">4</div>
+        <div class="step-title">Schema Markup</div>
+        <div class="step-sub">JSON-LD attached: <span class="font-mono">LocalBusiness</span>, <span class="font-mono">Service</span>, <span class="font-mono">ConstructionProject</span>.</div>
+        <div class="step-io">
+          <div><span class="lbl">In:</span> copy + facts</div>
+          <div><span class="lbl">Out:</span> JSON-LD blob</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">5</div>
+        <div class="step-title">WordPress Publish</div>
+        <div class="step-sub">Page rendered with metadata, sitemap entry, IndexNow ping for AI crawlers.</div>
+        <div class="step-io">
+          <div><span class="lbl">In:</span> enriched record</div>
+          <div><span class="lbl">Out:</span> live URL</div>
+        </div>
+      </div>
+    </div>
+    <p class="text-xs text-slate-500 mt-4 text-center">Stages run as discrete jobs. Failed rows are quarantined for review, not silently dropped.</p>
+  </section>
+
+  <!-- STAGE WALKTHROUGH -->
+  <section id="stages" class="space-y-6">
+    <div>
+      <h2 class="text-2xl font-bold text-navy">Stage Walkthrough</h2>
+      <p class="text-sm text-slate-500 mt-1">What actually happens inside each stage.</p>
+    </div>
+
+    <!-- STAGE 1 -->
+    <div class="stage-card">
+      <div class="stage-head">
+        <div class="num">1</div>
+        <div>
+          <div class="text-base font-bold text-navy">Raw Permit Ingest</div>
+          <div class="text-xs text-slate-500 mt-0.5">Pulled nightly from the MN state electrical permit feed.</div>
+        </div>
+      </div>
+      <div class="stage-body grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <div class="panel-title mb-2">What goes in</div>
+          <p class="text-sm text-slate-600 leading-relaxed">A flat permit row keyed by permit ID. Fields include applicant, GC, scope text, site address, county, permit type, fee, and filing date. Free-text fields are inconsistent — <span class="font-mono text-xs">"800A METER BANK"</span> in one row, <span class="font-mono text-xs">"800-amp service entrance"</span> in the next.</p>
+          <div class="raw-card mt-3"><span class="k">permit_id:</span> ELE2603-02783
+<span class="k">applicant:</span> J BECHER &amp; ASSOC INC
+<span class="k">gc:</span> FRERICHS CONSTRUCTION
+<span class="k">site:</span> 2929 UNIVERSITY AVE SE
+<span class="k">city:</span> MINNEAPOLIS
+<span class="k">county:</span> HENNEPIN
+<span class="k">type:</span> RES-MULTI
+<span class="k">scope:</span> 10 UNIT TOWNHOME, 800A METER BANK
+<span class="k">fee:</span> $1,282.00
+<span class="k">filed:</span> 2026-03-04</div>
+        </div>
+        <div>
+          <div class="panel-title mb-2">What comes out</div>
+          <p class="text-sm text-slate-600 leading-relaxed">A normalized row with canonicalized addresses, parsed scope tokens (unit counts, electrical service amperage, project type), and a clean GC name. Nothing is "enriched" yet — this stage is about making the row machine-readable.</p>
+          <div class="kv mt-3">
+            <div class="lbl">unit_count</div><div class="val">10</div>
+            <div class="lbl">service_amps</div><div class="val">800</div>
+            <div class="lbl">project_type</div><div class="val">res_multi · new_construction</div>
+            <div class="lbl">gc_canonical</div><div class="val">Frerichs Construction</div>
+            <div class="lbl">geo</div><div class="val">Minneapolis, Hennepin County, MN</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE 2 -->
+    <div class="stage-card">
+      <div class="stage-head">
+        <div class="num">2</div>
+        <div>
+          <div class="text-base font-bold text-navy">Classification — Skip / Light / Full</div>
+          <div class="text-xs text-slate-500 mt-0.5">Triage every row so Claude only sees the records worth narrating.</div>
+        </div>
+      </div>
+      <div class="stage-body grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div>
+          <div class="badge-row mb-2"><span class="badge badge-skip">skip</span></div>
+          <p class="text-sm text-slate-600 leading-relaxed">Single-family service swaps, panel replacements, and generic residential rough-ins. Stored for the dashboard counts but not given a page. Saves token spend on low-signal records.</p>
+        </div>
+        <div>
+          <div class="badge-row mb-2"><span class="badge badge-light">enrich_light</span></div>
+          <p class="text-sm text-slate-600 leading-relaxed">Mid-size jobs — single-family new construction, small commercial, EV charger installs. Gets a short SEO headline + body, but no full project narrative. Schema markup is still attached.</p>
+        </div>
+        <div>
+          <div class="badge-row mb-2"><span class="badge badge-full">enrich_full</span></div>
+          <p class="text-sm text-slate-600 leading-relaxed">Multifamily, healthcare, large commercial, marquee GC partnerships. Full Claude treatment: headline, body, ad preview, tags, and complete <span class="font-mono text-xs">ConstructionProject</span> schema.</p>
+        </div>
+      </div>
+      <div class="stage-body pt-0">
+        <div class="panel-title mb-2">Classification logic (simplified)</div>
+        <div class="code-card"><span class="c">// classifier.ts</span>
+<span class="k">function</span> <span class="t">classify</span>(row) {
+  <span class="k">if</span> (row.fee &lt; <span class="n">300</span> &amp;&amp; row.unit_count &lt;= <span class="n">1</span>) <span class="k">return</span> <span class="s">"skip"</span>;
+  <span class="k">if</span> (row.project_type === <span class="s">"res_multi"</span>) <span class="k">return</span> <span class="s">"enrich_full"</span>;
+  <span class="k">if</span> (row.project_type === <span class="s">"commercial"</span> &amp;&amp; row.fee &gt;= <span class="n">1500</span>) <span class="k">return</span> <span class="s">"enrich_full"</span>;
+  <span class="k">if</span> (row.scope_tokens.includes(<span class="s">"ev_charger"</span>)) <span class="k">return</span> <span class="s">"enrich_light"</span>;
+  <span class="k">return</span> <span class="s">"enrich_light"</span>;
+}</div>
+      </div>
+    </div>
+
+    <!-- STAGE 3 -->
+    <div class="stage-card is-ai">
+      <div class="stage-head">
+        <div class="num">3</div>
+        <div>
+          <div class="text-base font-bold text-navy">AI Enrichment — Claude API</div>
+          <div class="text-xs text-slate-500 mt-0.5">A single Claude call returns a typed, schema-validated copy block.</div>
+        </div>
+      </div>
+      <div class="stage-body grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <div class="panel-title mb-2">Why Claude, and why structured output</div>
+          <p class="text-sm text-slate-600 leading-relaxed">The model is asked for a strict JSON object with named fields — <span class="font-mono text-xs">headline</span>, <span class="font-mono text-xs">body</span>, <span class="font-mono text-xs">tags</span>, <span class="font-mono text-xs">ad_title</span>, <span class="font-mono text-xs">ad_desc</span>. Structured output is enforced by a tool-use schema, so the response is never free-form prose that has to be parsed. If the model returns a malformed field, the row is retried with a stricter prompt or routed to manual review.</p>
+          <p class="text-sm text-slate-600 leading-relaxed mt-3">The prompt includes J Becher's brand voice (union-trained, IBEW Local 292 signatory, Twin Cities multifamily depth) and forbids hallucinated facts — Claude only narrates what's in the row.</p>
+        </div>
+        <div>
+          <div class="panel-title mb-2">Claude output (validated JSON)</div>
+          <div class="code-card"><span class="k">{</span>
+  <span class="k">"headline":</span> <span class="s">"10-Unit Townhome with 800A
+              Service — Frerichs Construction"</span>,
+  <span class="k">"body":</span> <span class="s">"J Becher &amp; Associates is providing
+          full electrical scope for a 10-unit
+          townhome project for Frerichs
+          Construction on University Avenue SE
+          in Minneapolis, Hennepin County..."</span>,
+  <span class="k">"tags":</span> [<span class="s">"Multifamily"</span>, <span class="s">"New Construction"</span>,
+           <span class="s">"Service Upgrade"</span>, <span class="s">"800A Meter Bank"</span>],
+  <span class="k">"ad_title":</span> <span class="s">"Townhome Electrical &amp; Service
+              Upgrades — Minneapolis | J Becher"</span>,
+  <span class="k">"ad_desc":</span> <span class="s">"IBEW Local 292 contractor for
+             10-unit townhomes, 800A meter banks,
+             and service entrance work."</span>
+<span class="k">}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE 4 -->
+    <div class="stage-card is-schema">
+      <div class="stage-head">
+        <div class="num">4</div>
+        <div>
+          <div class="text-base font-bold text-navy">Schema Markup — JSON-LD</div>
+          <div class="text-xs text-slate-500 mt-0.5">The piece that turns a webpage into a fact the AI can cite.</div>
+        </div>
+      </div>
+      <div class="stage-body grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <div class="panel-title mb-2">What schema attaches to each page</div>
+          <div class="schema-list mt-1">
+            <div class="schema-tile">
+              <div class="tname">LocalBusiness</div>
+              <div class="tdesc">Identifies J Becher as a real, named business with address, service area, and union affiliation.</div>
+            </div>
+            <div class="schema-tile">
+              <div class="tname">Service</div>
+              <div class="tdesc">Describes the specific service category — multifamily electrical, EV charger install, service upgrade.</div>
+            </div>
+            <div class="schema-tile">
+              <div class="tname">ConstructionProject</div>
+              <div class="tdesc">Wraps the project itself: location, GC, scope, unit count, completion status.</div>
+            </div>
+          </div>
+          <p class="text-sm text-slate-600 leading-relaxed mt-4">Pages without schema are <span class="font-semibold text-navy">unreadable to AI search</span>. The crawler may see "10 unit townhome" in the body text, but with no schema it can't confidently link that fact to J Becher as the electrical contractor of record. With schema, the relationship is explicit and machine-resolvable.</p>
+        </div>
+        <div>
+          <div class="panel-title mb-2">Example JSON-LD (rendered in page head)</div>
+          <div class="code-card"><span class="k">{</span>
+  <span class="k">"@context":</span> <span class="s">"https://schema.org"</span>,
+  <span class="k">"@type":</span> <span class="s">"ConstructionProject"</span>,
+  <span class="k">"name":</span> <span class="s">"10-Unit Townhome — University Ave SE"</span>,
+  <span class="k">"location":</span> {
+    <span class="k">"@type":</span> <span class="s">"Place"</span>,
+    <span class="k">"address":</span> {
+      <span class="k">"@type":</span> <span class="s">"PostalAddress"</span>,
+      <span class="k">"streetAddress":</span> <span class="s">"2929 University Ave SE"</span>,
+      <span class="k">"addressLocality":</span> <span class="s">"Minneapolis"</span>,
+      <span class="k">"addressRegion":</span> <span class="s">"MN"</span>,
+      <span class="k">"postalCode":</span> <span class="s">"55414"</span>
+    }
+  },
+  <span class="k">"contractor":</span> {
+    <span class="k">"@type":</span> <span class="s">"LocalBusiness"</span>,
+    <span class="k">"name":</span> <span class="s">"J Becher &amp; Associates"</span>,
+    <span class="k">"memberOf":</span> <span class="s">"IBEW Local 292"</span>,
+    <span class="k">"areaServed":</span> <span class="s">"Twin Cities, MN"</span>
+  },
+  <span class="k">"generalContractor":</span> <span class="s">"Frerichs Construction"</span>,
+  <span class="k">"numberOfUnits":</span> <span class="n">10</span>,
+  <span class="k">"serviceCategory":</span> <span class="s">"Multifamily Electrical"</span>
+<span class="k">}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE 5 -->
+    <div class="stage-card">
+      <div class="stage-head">
+        <div class="num">5</div>
+        <div>
+          <div class="text-base font-bold text-navy">WordPress Publishing</div>
+          <div class="text-xs text-slate-500 mt-0.5">Rendered as a project page, indexed, and pinged to AI crawlers.</div>
+        </div>
+      </div>
+      <div class="stage-body grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <p class="text-sm text-slate-600 leading-relaxed">Each enriched record becomes a project page on the J Becher WordPress site. The page includes the Claude-generated body, the project tags as filterable categories, the JSON-LD schema in the page head, and an Open Graph / Twitter card for social previews.</p>
+          <p class="text-sm text-slate-600 leading-relaxed mt-3">On publish, three things happen in parallel:</p>
+          <ul class="checklist mt-2">
+            <li>Sitemap entry added and submitted to Google &amp; Bing</li>
+            <li><span class="font-mono text-xs">IndexNow</span> ping sent so AI crawlers (Bing, Perplexity, OpenAI) discover the URL within minutes</li>
+            <li>Project added to the internal dashboard counts and GC relationship map</li>
+          </ul>
+        </div>
+        <div>
+          <div class="panel-title mb-2">Published page (rendered)</div>
+          <div class="border border-slate-200 rounded-lg overflow-hidden">
+            <div class="bg-slate-100 px-3 py-2 text-xs text-slate-500 font-mono border-b border-slate-200 flex items-center gap-2">
+              <span class="text-slate-400">jbecherelectric.com/projects/</span><span class="text-navy">frerichs-10-unit-townhome-800a</span>
+            </div>
+            <div class="p-4 bg-white">
+              <div class="badge-row mb-2">
+                <span class="badge badge-full">Multifamily</span>
+                <span class="badge badge-light">New Construction</span>
+                <span class="badge badge-skip">800A Meter Bank</span>
+              </div>
+              <div class="text-base font-bold text-navy">10-Unit Townhome with 800A Service — Frerichs Construction</div>
+              <p class="text-xs text-slate-600 mt-2 leading-relaxed">J Becher &amp; Associates is providing full electrical scope for a 10-unit townhome project for Frerichs Construction on University Avenue SE in Minneapolis, Hennepin County...</p>
+              <div class="text-[10px] text-slate-400 mt-3 font-mono">&lt;script type="application/ld+json"&gt; ... &lt;/script&gt;</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY SCHEMA MATTERS -->
+  <section id="schema">
+    <div class="flex items-end justify-between mb-5">
+      <div>
+        <h2 class="text-2xl font-bold text-navy">Why correct schema is non-negotiable</h2>
+        <p class="text-sm text-slate-500 mt-1 max-w-2xl">Schema.org structured data is the contract between your website and machine readers — search engines, AI assistants, and knowledge graphs.</p>
+      </div>
+      <span class="pill pill-teal">schema.org</span>
+    </div>
+
+    <div class="why-grid">
+      <div class="why-item">
+        <div class="icon-wrap">A</div>
+        <h4>It's how AI search answers a question</h4>
+        <p>Google SGE, Bing Copilot, Perplexity, and ChatGPT search don't crawl pages the way classic Google does. They synthesize answers from indexed facts. Schema gives them the typed facts to cite — "this contractor, this service, this location."</p>
+      </div>
+      <div class="why-item">
+        <div class="icon-wrap">B</div>
+        <h4>It survives copy changes</h4>
+        <p>The body text on a project page may be rewritten. The schema block holds the canonical facts — GC, address, unit count, service category — so the page's meaning doesn't drift even when the prose does.</p>
+      </div>
+      <div class="why-item">
+        <div class="icon-wrap">C</div>
+        <h4>Wrong schema is worse than none</h4>
+        <p>A <span class="font-mono text-xs">Service</span> with a missing <span class="font-mono text-xs">areaServed</span>, or a <span class="font-mono text-xs">LocalBusiness</span> with the wrong NAP, can get the entire site disqualified from rich results. Validation has to be part of the pipeline, not an afterthought.</p>
+      </div>
+      <div class="why-item">
+        <div class="icon-wrap">D</div>
+        <h4>It links pages into a graph</h4>
+        <p>Every project page references the same <span class="font-mono text-xs">LocalBusiness</span> entity for J Becher. AI assistants follow those references to build a confident picture: 758 permits, 33 counties, IBEW Local 292, multifamily strength.</p>
+      </div>
+      <div class="why-item">
+        <div class="icon-wrap">E</div>
+        <h4>It's how you show up in zero-click answers</h4>
+        <p>The future of search isn't a list of blue links — it's an AI answer with two or three cited contractors. Without schema, you're not in the answer. With schema, you're a candidate every time the question matches your service area.</p>
+      </div>
+      <div class="why-item">
+        <div class="icon-wrap">F</div>
+        <h4>It compounds across 758 pages</h4>
+        <p>A single project page with correct schema is a data point. 758 project pages with consistent schema is a market signal. Both Google and the AI assistants pick up on the density and breadth of structured coverage.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI SEARCH VISIBILITY -->
+  <section id="ai-search">
+    <div class="flex items-end justify-between mb-5">
+      <div>
+        <h2 class="text-2xl font-bold text-navy">How this shows up in an AI answer</h2>
+        <p class="text-sm text-slate-500 mt-1 max-w-2xl">A simulated AI search result for a question a GC project manager might actually type.</p>
+      </div>
+      <span class="pill">Simulated</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="ai-answer">
+        <div class="ai-q">Perplexity / Google SGE</div>
+        <div class="ai-prompt">"Who installs 800-amp service for multifamily in the Twin Cities?"</div>
+        <div class="ai-meta">⚡ Generated answer · 4 sources cited</div>
+        <p class="ai-body">
+          <span class="font-semibold text-navy">J Becher &amp; Associates</span> is a Minneapolis-based IBEW Local 292 signatory electrical contractor with documented experience installing 800A meter banks and service entrances for multifamily projects in Hennepin County. A recent project on University Avenue SE delivered an 800A meter bank for a 10-unit townhome build with Frerichs Construction.<sup class="ai-cite">[1]</sup> J Becher has filed 40+ multifamily permits across the Twin Cities since 2025.<sup class="ai-cite">[2]</sup>
+        </p>
+      </div>
+
+      <div class="ai-answer">
+        <div class="ai-q">ChatGPT search / Bing Copilot</div>
+        <div class="ai-prompt">"Electrical contractors that do nursing home remodels in NE Minneapolis"</div>
+        <div class="ai-meta">⚡ Generated answer · 3 sources cited</div>
+        <p class="ai-body">
+          For senior care and nursing home electrical work in NE Minneapolis, <span class="font-semibold text-navy">J Becher &amp; Associates</span> has handled remodels for Catholic Eldercare on Main Street NE, including life-safety, emergency power, and patient-room electrical to current code.<sup class="ai-cite">[1]</sup> The firm is a Hennepin County–based IBEW Local 292 signatory contractor with a long track record in healthcare environments.
+        </p>
+      </div>
+    </div>
+
+    <div class="card mt-6 p-5 bg-navy text-slate-200 border-0">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <div class="text-xs font-bold text-orange uppercase tracking-wider">The mechanism</div>
+          <p class="text-sm mt-2 leading-relaxed">AI search engines retrieve pages, but they <em>cite</em> facts. Schema markup is what turns a paragraph of prose into a fact they can cite confidently.</p>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-orange uppercase tracking-wider">The compounding effect</div>
+          <p class="text-sm mt-2 leading-relaxed">Every additional enriched project page strengthens the entity graph: same business, more services, broader area served. AI ranks confident entities ahead of fuzzy ones.</p>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-orange uppercase tracking-wider">The competitive edge</div>
+          <p class="text-sm mt-2 leading-relaxed">Most contractor sites publish 8–12 case studies. The J Becher portal publishes 758 schema-marked project pages — a coverage gap competitors can't close in a quarter.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SINGLE-RECORD WALKTHROUGH -->
+  <section id="walkthrough">
+    <div class="flex items-end justify-between mb-5">
+      <div>
+        <h2 class="text-2xl font-bold text-navy">One record, all five stages</h2>
+        <p class="text-sm text-slate-500 mt-1 max-w-2xl">Follow permit <span class="font-mono text-xs">ELE2603-02783</span> from raw row to live page.</p>
+      </div>
+      <span class="pill">End-to-end</span>
+    </div>
+
+    <div class="space-y-3">
+      <div class="card p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-8 h-8 rounded-md bg-navy text-white flex items-center justify-center text-xs font-bold">1</div>
+          <div class="text-sm font-bold text-navy">Raw row from MN state feed</div>
+        </div>
+        <div class="raw-card"><span class="k">permit_id:</span> ELE2603-02783
+<span class="k">applicant:</span> J BECHER &amp; ASSOC INC
+<span class="k">gc:</span> FRERICHS CONSTRUCTION
+<span class="k">site:</span> 2929 UNIVERSITY AVE SE
+<span class="k">city:</span> MINNEAPOLIS · <span class="k">county:</span> HENNEPIN
+<span class="k">type:</span> RES-MULTI · <span class="k">scope:</span> 10 UNIT TOWNHOME, 800A METER BANK
+<span class="k">fee:</span> $1,282.00 · <span class="k">filed:</span> 2026-03-04</div>
+      </div>
+
+      <div class="arrow-row">↓</div>
+
+      <div class="card p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-8 h-8 rounded-md bg-navy text-white flex items-center justify-center text-xs font-bold">2</div>
+          <div class="text-sm font-bold text-navy">Classification</div>
+          <span class="badge badge-full ml-auto">enrich_full</span>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed">Multifamily project type + service amperage of 800A + named GC → routed to full enrichment.</p>
+      </div>
+
+      <div class="arrow-row">↓</div>
+
+      <div class="card p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-8 h-8 rounded-md bg-orange text-white flex items-center justify-center text-xs font-bold">3</div>
+          <div class="text-sm font-bold text-navy">Claude enrichment</div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div class="panel-title mb-1.5">Headline</div>
+            <div class="text-sm font-semibold text-navy">10-Unit Townhome with 800A Service — Frerichs Construction</div>
+          </div>
+          <div>
+            <div class="panel-title mb-1.5">Tags</div>
+            <div class="badge-row">
+              <span class="badge badge-full">Multifamily</span>
+              <span class="badge badge-light">New Construction</span>
+              <span class="badge badge-skip">Service Upgrade</span>
+              <span class="badge badge-skip">800A Meter Bank</span>
+            </div>
+          </div>
+          <div class="md:col-span-2">
+            <div class="panel-title mb-1.5">Body</div>
+            <p class="text-sm text-slate-700 leading-relaxed">J Becher &amp; Associates is providing full electrical scope for a 10-unit townhome project for Frerichs Construction on University Avenue SE in Minneapolis, Hennepin County. The project includes an 800 amp meter bank to support metered service for all ten units along with site, unit, and common-area electrical...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow-row">↓</div>
+
+      <div class="card p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-8 h-8 rounded-md bg-teal text-white flex items-center justify-center text-xs font-bold">4</div>
+          <div class="text-sm font-bold text-navy">JSON-LD schema attached</div>
+        </div>
+        <div class="code-card"><span class="k">&lt;script type=</span><span class="s">"application/ld+json"</span><span class="k">&gt;</span>
+{ <span class="k">"@type":</span> <span class="s">"ConstructionProject"</span>, <span class="k">"numberOfUnits":</span> <span class="n">10</span>,
+  <span class="k">"contractor":</span> { <span class="k">"@type":</span> <span class="s">"LocalBusiness"</span>, <span class="k">"name":</span> <span class="s">"J Becher &amp; Associates"</span> },
+  <span class="k">"generalContractor":</span> <span class="s">"Frerichs Construction"</span>,
+  <span class="k">"location":</span> { ... <span class="s">"Minneapolis, MN"</span> ... } }
+<span class="k">&lt;/script&gt;</span></div>
+      </div>
+
+      <div class="arrow-row">↓</div>
+
+      <div class="card p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-8 h-8 rounded-md bg-navy text-white flex items-center justify-center text-xs font-bold">5</div>
+          <div class="text-sm font-bold text-navy">Live on WordPress</div>
+        </div>
+        <div class="kv">
+          <div class="lbl">url</div><div class="val font-mono text-xs text-navy">jbecherelectric.com/projects/frerichs-10-unit-townhome-800a</div>
+          <div class="lbl">indexed</div><div class="val">Sitemap submitted · IndexNow ping sent</div>
+          <div class="lbl">rich result</div><div class="val">Eligible — ConstructionProject + LocalBusiness</div>
+          <div class="lbl">ai-discoverable</div><div class="val">Yes — cited in synthesized answers for Minneapolis multifamily electrical queries</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER NOTE -->
+  <footer class="pt-6 pb-12 text-xs text-slate-500 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200">
+    <div>
+      <span class="font-semibold text-slate-700">J Becher &amp; Associates</span>
+      <span class="mx-2">·</span>
+      IBEW Local 292 Signatory Electrical Contractor
+      <span class="mx-2">·</span>
+      Twin Cities, MN
+    </div>
+    <div>
+      Portal built &amp; maintained by
+      <a href="https://www.emendesign.com" class="text-orange font-semibold hover:underline">Em En Design</a>
+    </div>
+  </footer>
+</main>
+
+</body>
+</html>
