@@ -240,6 +240,217 @@
   .code-mini .k { color: #94A3B8; }
   .code-mini .s { color: #FBE7D6; }
   .code-mini .n { color: #F59E0B; }
+  /* Strategic Intelligence */
+  .lens-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .lens-tag-orange {
+    background: var(--orange-soft);
+    color: #A0470F;
+    border: 1px solid rgba(232, 108, 27, 0.3);
+  }
+  .lens-tag-teal {
+    background: rgba(13, 148, 136, 0.12);
+    color: #0D9488;
+    border: 1px solid rgba(13, 148, 136, 0.3);
+  }
+  .cluster-row {
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+  }
+  .cluster-row:first-child { border-top: 0; padding-top: 4px; }
+  .cluster-row .cr-top {
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  .cluster-row .cr-count {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--orange);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .cluster-row .cr-source {
+    font-size: 13px;
+    color: #475569;
+    font-weight: 500;
+  }
+  .cluster-row .cr-arrow {
+    color: var(--orange);
+    font-weight: 800;
+    font-size: 14px;
+    margin: 6px 0 4px 0;
+    display: inline-block;
+  }
+  .cluster-row .cr-target {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .cluster-row .cr-vis {
+    display: flex; align-items: center; gap: 5px;
+    margin-top: 7px;
+  }
+  .cluster-row .cr-vis .pillar-dot {
+    width: 13px; height: 13px;
+    border-radius: 3px;
+    background: var(--orange);
+  }
+  .cluster-row .cr-vis .spoke-dot {
+    width: 9px; height: 9px;
+    border-radius: 2px;
+    background: rgba(13, 148, 136, 0.65);
+  }
+  .cluster-row .cr-vis .vis-label {
+    font-size: 11px;
+    color: #94A3B8;
+    margin-left: 10px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  /* Alert cards */
+  .alert-card {
+    background: #FAFBFC;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--orange);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .alert-card:last-child { margin-bottom: 0; }
+  .alert-card.alert-trend { border-left-color: var(--teal); }
+  .alert-card.alert-warn { border-left-color: #DC2626; }
+  .alert-head {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px;
+  }
+  .alert-icon { font-size: 14px; line-height: 1; }
+  .alert-time {
+    font-size: 10.5px;
+    color: #94A3B8;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .alert-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.35;
+  }
+  .alert-body {
+    font-size: 12.5px;
+    color: #475569;
+    line-height: 1.55;
+    margin-top: 4px;
+  }
+  /* Topical authority cluster diagram */
+  .cluster-diagram {
+    position: relative;
+    padding: 14px 0 8px;
+  }
+  .cluster-pillar {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    background: var(--navy);
+    color: white;
+    padding: 16px 22px;
+    border-radius: 12px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    border: 2px solid var(--orange);
+    box-shadow: 0 10px 30px -12px rgba(232, 108, 27, 0.35);
+  }
+  .cluster-pillar .cp-tag {
+    font-size: 10.5px;
+    color: var(--orange);
+    letter-spacing: 0.08em;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .cluster-pillar .cp-title {
+    font-size: 17px;
+    font-weight: 800;
+    margin-top: 4px;
+    line-height: 1.25;
+  }
+  .cluster-pillar .cp-sub {
+    font-size: 11px;
+    color: #94A3B8;
+    margin-top: 6px;
+  }
+  .cluster-trunk {
+    position: relative;
+    height: 36px;
+    max-width: 92%;
+    margin: 0 auto;
+  }
+  .cluster-trunk::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 2px; height: 20px;
+    background: #0D9488;
+  }
+  .cluster-trunk::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 8.33%;
+    right: 8.33%;
+    height: 2px;
+    background: #0D9488;
+  }
+  .cluster-spokes {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+  }
+  .spoke {
+    position: relative;
+    background: white;
+    border: 1px solid var(--line);
+    border-top: 3px solid #0D9488;
+    border-radius: 10px;
+    padding: 14px 10px 12px;
+    text-align: center;
+  }
+  .spoke::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 16px;
+    background: #0D9488;
+  }
+  .spoke .spoke-tag {
+    font-size: 9.5px;
+    color: #0D9488;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .spoke .spoke-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  @media (max-width: 900px) {
+    .cluster-spokes { grid-template-columns: repeat(2, 1fr); }
+    .cluster-trunk { display: none; }
+    .spoke::before { display: none; }
+  }
 </style>
 </head>
 <body class="text-slate-900">
@@ -271,6 +482,7 @@
     <a href="#relationships" class="hover:text-white">GC Relationships</a>
     <a href="#sectors" class="hover:text-white">Sector Mix</a>
     <a href="#geo" class="hover:text-white">Geographic Coverage</a>
+    <a href="#intelligence" class="hover:text-white">Strategic Intelligence</a>
     <a href="#roadmap" class="hover:text-white">Roadmap</a>
     <a href="/enrichment" class="text-orange hover:text-white font-semibold">How It Works →</a>
     <span class="ml-auto text-slate-500">Data window: Jan 2025 — Apr 2026</span>
@@ -683,7 +895,190 @@
     </div>
   </section>
 
-  <!-- PANEL 6: ROADMAP -->
+  <!-- PANEL 6: STRATEGIC INTELLIGENCE -->
+  <section id="intelligence">
+    <div class="flex items-end justify-between mb-4">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <h2 class="text-2xl font-bold text-navy">Strategic Intelligence</h2>
+          <span class="phase-badge phase-3">Phase 3</span>
+        </div>
+        <p class="text-sm text-slate-500 mt-1 max-w-3xl">Permit data isn't just raw material for project pages. The same feed becomes a market-intelligence layer — telling J Becher which topics to own in search, where competitor activity is heating up, and which GC partnerships are quietly drifting.</p>
+      </div>
+      <span class="pill pill-navy">Concept Preview</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+      <!-- INWARD LENS -->
+      <div class="card p-6">
+        <div class="flex items-baseline gap-2 mb-1">
+          <span class="lens-tag lens-tag-orange">Inward Lens</span>
+        </div>
+        <h3 class="text-lg font-bold text-navy mt-2">Your Work → Content Assets</h3>
+        <p class="text-xs text-slate-500 mt-1">J Becher's own permit volume tells you which topics are worth owning in search.</p>
+
+        <div class="mt-4">
+          <div class="cluster-row">
+            <div class="cr-top">
+              <div class="cr-count">213</div>
+              <div class="cr-source">EV charger installs · Level 2 + DCFC across all sectors</div>
+            </div>
+            <div class="cr-arrow">↓</div>
+            <div class="cr-target">EV Charging Authority Cluster</div>
+            <div class="cr-vis">
+              <span class="pillar-dot"></span>
+              <span class="spoke-dot"></span><span class="spoke-dot"></span><span class="spoke-dot"></span>
+              <span class="spoke-dot"></span><span class="spoke-dot"></span><span class="spoke-dot"></span>
+              <span class="vis-label">1 pillar · 6 supporting · FAQ subset</span>
+            </div>
+          </div>
+
+          <div class="cluster-row">
+            <div class="cr-top">
+              <div class="cr-count">40</div>
+              <div class="cr-source">Multifamily permits · Apartments + townhomes, MN-wide</div>
+            </div>
+            <div class="cr-arrow">↓</div>
+            <div class="cr-target">Multifamily Electrical Systems Cluster</div>
+            <div class="cr-vis">
+              <span class="pillar-dot"></span>
+              <span class="spoke-dot"></span><span class="spoke-dot"></span><span class="spoke-dot"></span>
+              <span class="spoke-dot"></span><span class="spoke-dot"></span>
+              <span class="vis-label">1 pillar · 5 supporting · GC case studies</span>
+            </div>
+          </div>
+
+          <div class="cluster-row">
+            <div class="cr-top">
+              <div class="cr-count">89</div>
+              <div class="cr-source">Commercial permits · Healthcare, senior living, MOB</div>
+            </div>
+            <div class="cr-arrow">↓</div>
+            <div class="cr-target">Commercial &amp; Life-Safety Cluster</div>
+            <div class="cr-vis">
+              <span class="pillar-dot"></span>
+              <span class="spoke-dot"></span><span class="spoke-dot"></span>
+              <span class="spoke-dot"></span><span class="spoke-dot"></span>
+              <span class="vis-label">1 pillar · 4 supporting · code reference</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 leading-relaxed">
+          Clusters are auto-seeded by permit-category volume. The more permits J Becher files in a category, the deeper the cluster — and the stronger the authority signal for AI search.
+        </div>
+      </div>
+
+      <!-- OUTWARD LENS -->
+      <div class="card p-6">
+        <div class="flex items-baseline gap-2 mb-1">
+          <span class="lens-tag lens-tag-teal">Outward Lens</span>
+        </div>
+        <h3 class="text-lg font-bold text-navy mt-2">Market Activity → Opportunities</h3>
+        <p class="text-xs text-slate-500 mt-1">Live alerts derived from competitor and GC permit filings across all 33 counties.</p>
+
+        <div class="mt-4">
+          <div class="alert-card">
+            <div class="alert-head">
+              <span class="alert-icon">🔔</span>
+              <span class="alert-time">2 hours ago · Dakota County</span>
+            </div>
+            <div class="alert-title">Kraus-Anderson pulled 3 large commercial permits in Dakota County</div>
+            <p class="alert-body">You've never worked with Kraus-Anderson, but J Becher has 30 projects in Dakota County — a direct intro angle backed by relevant local proof and recent commercial scope.</p>
+          </div>
+
+          <div class="alert-card alert-trend">
+            <div class="alert-head">
+              <span class="alert-icon">📈</span>
+              <span class="alert-time">This week · Washington County</span>
+            </div>
+            <div class="alert-title">EV install permits up 40% QoQ in Washington County</div>
+            <p class="alert-body">Trend just turned. Spin up the EV cluster's Washington-County supporting page now to own this search territory before competitors notice the same data.</p>
+          </div>
+
+          <div class="alert-card alert-warn">
+            <div class="alert-head">
+              <span class="alert-icon">⚠️</span>
+              <span class="alert-time">3 days ago · Anoka County</span>
+            </div>
+            <div class="alert-title">Progressive Builders filing in Anoka with Nordic Electric</div>
+            <p class="alert-body">Your top GC partnership (72 permits) is testing a competitor on two new Anoka County permits. Worth a relationship check-in this week.</p>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 leading-relaxed">
+          Same permit feed, different lens. The outward view treats rivals' filings as deal flow and trend signals.
+        </div>
+      </div>
+    </div>
+
+    <!-- TOPICAL AUTHORITY CLUSTER VISUAL -->
+    <div class="card p-6 mt-5">
+      <div class="flex items-end justify-between mb-1">
+        <div>
+          <div class="panel-title">Topical Authority Cluster · Example</div>
+          <h3 class="text-lg font-bold text-navy mt-1.5">Commercial EV Charging Installation in Minnesota</h3>
+          <p class="text-xs text-slate-500 mt-1 max-w-2xl">Seeded by 213 EV install permits in J Becher's portfolio. Pillar and supporting pages interlink to build the topical authority AI search rewards.</p>
+        </div>
+        <span class="pill pill-navy">Auto-seeded</span>
+      </div>
+
+      <div class="cluster-diagram mt-5">
+        <div class="cluster-pillar">
+          <div class="cp-tag">Pillar Page</div>
+          <div class="cp-title">Commercial EV Charging Installation in Minnesota</div>
+          <div class="cp-sub">Long-form authority · ~3,500 words · LocalBusiness + Service schema</div>
+        </div>
+
+        <div class="cluster-trunk" aria-hidden="true"></div>
+
+        <div class="cluster-spokes">
+          <div class="spoke">
+            <div class="spoke-tag">Supporting</div>
+            <div class="spoke-title">EV Permit Requirements by Minnesota County</div>
+          </div>
+          <div class="spoke">
+            <div class="spoke-tag">Supporting</div>
+            <div class="spoke-title">Charger Types &amp; Electrical Load Planning</div>
+          </div>
+          <div class="spoke">
+            <div class="spoke-tag">Supporting</div>
+            <div class="spoke-title">Xcel Energy &amp; Utility Rebate Programs</div>
+          </div>
+          <div class="spoke">
+            <div class="spoke-tag">Supporting</div>
+            <div class="spoke-title">ADA Compliance for Public EV Stations</div>
+          </div>
+          <div class="spoke">
+            <div class="spoke-tag">Supporting</div>
+            <div class="spoke-title">EV Install Cost Guide · Twin Cities Metro</div>
+          </div>
+          <div class="spoke">
+            <div class="spoke-tag">Supporting</div>
+            <div class="spoke-title">Service Upgrades Required for DCFC Installs</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 pt-4 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div>
+          <div class="font-semibold text-navy">Internal interlinking</div>
+          <p class="text-slate-500 mt-1 leading-relaxed">Every supporting page links back to the pillar and to 2–3 sibling pages. Signals topical depth, not just keyword coverage.</p>
+        </div>
+        <div>
+          <div class="font-semibold text-navy">Permit-driven scoping</div>
+          <p class="text-slate-500 mt-1 leading-relaxed">The cluster only includes pages where J Becher actually has filed permits — every claim is backed by real project data, never invented.</p>
+        </div>
+        <div>
+          <div class="font-semibold text-navy">Feeds the AI answer</div>
+          <p class="text-slate-500 mt-1 leading-relaxed">Pillar gets cited in synthesized answers; supporting pages provide the specifics LLMs pull when the question narrows by county, charger type, or budget.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANEL 7: ROADMAP -->
   <section id="roadmap">
     <div class="flex items-end justify-between mb-4">
       <div>
