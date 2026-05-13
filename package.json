@@ -1,0 +1,10 @@
+{
+  "name": "jbecher-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "J Becher & Associates — Contractor Visibility Portal demo",
+  "scripts": {
+    "dev": "npx serve public",
+    "start": "npx serve public"
+  }
+}

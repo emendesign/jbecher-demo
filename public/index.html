@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>J Becher &amp; Associates — Contractor Visibility Portal</title>
+<meta name="description" content="J Becher & Associates contractor visibility portal — permit intelligence, project enrichment, and market coverage for IBEW Local 292 electrical contractors." />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #111B2E;
+    --navy-2: #1A2740;
+    --orange: #E86C1B;
+    --orange-soft: #FBE7D6;
+    --ink: #0F172A;
+    --muted: #64748B;
+    --line: #E5E7EB;
+    --bg: #F6F7F9;
+  }
+  html, body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--ink); }
+  .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .text-navy { color: var(--navy); }
+  .bg-navy { background-color: var(--navy); }
+  .bg-navy-2 { background-color: var(--navy-2); }
+  .text-orange { color: var(--orange); }
+  .bg-orange { background-color: var(--orange); }
+  .border-orange { border-color: var(--orange); }
+  .ring-orange { --tw-ring-color: var(--orange); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; }
+  .panel-title { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .stat-num { font-variant-numeric: tabular-nums; }
+  .bar-track { background: #F1F3F6; border-radius: 6px; height: 8px; overflow: hidden; }
+  .bar-fill { background: var(--orange); height: 100%; border-radius: 6px; }
+  .raw-card {
+    background: #F4F5F7;
+    border: 1px dashed #C9CED6;
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.55;
+    color: #475569;
+    white-space: pre-wrap;
+  }
+  .raw-card .k { color: #94A3B8; }
+  .enriched-card {
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--orange);
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -12px rgba(15, 23, 42, 0.08);
+  }
+  .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--orange-soft); color: #A0470F;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .tag-blue { background: #E4ECF7; color: #1E3A8A; }
+  .tag-green { background: #DCFCE7; color: #166534; }
+  .tag-slate { background: #E2E8F0; color: #334155; }
+  .arrow-col { position: relative; }
+  .arrow-col::after {
+    content: '';
+    position: absolute; left: 50%; top: 50%;
+    width: 28px; height: 28px;
+    transform: translate(-50%, -50%) rotate(45deg);
+    background: var(--orange);
+    border-radius: 4px;
+    z-index: 1;
+  }
+  .arrow-col::before {
+    content: '→';
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    color: white; font-weight: 800; font-size: 16px;
+    z-index: 2;
+  }
+  @media (max-width: 900px) {
+    .arrow-col::after, .arrow-col::before { display: none; }
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(232, 108, 27, 0.12);
+    color: var(--orange);
+    border: 1px solid rgba(232, 108, 27, 0.3);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .kpi-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+  .kpi-label { font-size: 12px; color: var(--muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+  .kpi-value { font-size: 32px; font-weight: 700; color: var(--navy); line-height: 1.1; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .kpi-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .seo-headline { font-size: 17px; font-weight: 700; color: var(--navy); line-height: 1.3; }
+  .seo-body { font-size: 13.5px; color: #334155; line-height: 1.6; margin-top: 8px; }
+  .ad-preview {
+    background: #F8FAFC;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 12px;
+  }
+  .ad-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+  .ad-title { font-size: 14px; font-weight: 600; color: #1A56DB; margin-top: 2px; }
+  .ad-desc { font-size: 12px; color: #475569; margin-top: 2px; line-height: 1.4; }
+  .tier-bar { display: flex; height: 28px; border-radius: 6px; overflow: hidden; }
+  .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+</style>
+</head>
+<body class="text-slate-900">
+
+<!-- HEADER -->
+<header class="bg-navy text-white">
+  <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-11 h-11 rounded-lg bg-orange flex items-center justify-center font-bold text-xl">JB</div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight">J Becher &amp; Associates</h1>
+        <p class="text-xs text-slate-300 mt-0.5">Contractor Visibility Portal — Powered by eMen Design</p>
+      </div>
+    </div>
+    <div class="hidden md:flex items-center gap-3 text-xs text-slate-300">
+      <span class="pill">Live Demo</span>
+      <span>IBEW Local 292</span>
+      <span class="text-slate-500">•</span>
+      <span>Twin Cities, MN</span>
+    </div>
+  </div>
+</header>
+
+<!-- SUBNAV -->
+<div class="bg-navy-2 text-slate-300 border-b border-slate-800">
+  <div class="max-w-7xl mx-auto px-6 py-2.5 flex items-center gap-6 text-xs font-medium overflow-x-auto">
+    <a href="#overview" class="text-white border-b-2 border-orange pb-1">Overview</a>
+    <a href="#enrichment" class="hover:text-white">Permit Enrichment</a>
+    <a href="#relationships" class="hover:text-white">GC Relationships</a>
+    <a href="#sectors" class="hover:text-white">Sector Mix</a>
+    <a href="#geo" class="hover:text-white">Geographic Coverage</a>
+    <span class="ml-auto text-slate-500">Data window: Jan 2025 — Apr 2026</span>
+  </div>
+</div>
+
+<main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+
+  <!-- PANEL 1: ACTIVITY OVERVIEW -->
+  <section id="overview">
+    <div class="flex items-end justify-between mb-4">
+      <div>
+        <h2 class="text-2xl font-bold text-navy">Activity Overview</h2>
+        <p class="text-sm text-slate-500 mt-1">Permit volume, fees paid, and footprint across Minnesota counties.</p>
+      </div>
+      <span class="pill">Last 16 months</span>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Permits</div>
+        <div class="kpi-value">758</div>
+        <div class="kpi-sub">Across all sectors</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Permit Fees Paid</div>
+        <div class="kpi-value">$99K</div>
+        <div class="kpi-sub">Aggregate filing fees</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Counties Served</div>
+        <div class="kpi-value">33</div>
+        <div class="kpi-sub">Statewide footprint</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">EV Charger Installs</div>
+        <div class="kpi-value">213</div>
+        <div class="kpi-sub">Level 2 + DCFC installs</div>
+      </div>
+    </div>
+
+    <!-- TIER BREAKDOWN -->
+    <div class="card mt-4 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div class="panel-title">Permit Tier Breakdown</div>
+          <div class="text-xs text-slate-500 mt-1">758 permits across three primary sectors</div>
+        </div>
+        <div class="text-xs text-slate-500 flex gap-4">
+          <span><span class="legend-dot" style="background:#E86C1B"></span>Residential 629</span>
+          <span><span class="legend-dot" style="background:#1E3A8A"></span>Commercial 89</span>
+          <span><span class="legend-dot" style="background:#0EA5A0"></span>Multi-Family 40</span>
+        </div>
+      </div>
+      <div class="tier-bar">
+        <div style="background:#E86C1B; width:82.98%;" title="Residential 629"></div>
+        <div style="background:#1E3A8A; width:11.74%;" title="Commercial 89"></div>
+        <div style="background:#0EA5A0; width:5.28%;" title="Multi-Family 40"></div>
+      </div>
+      <div class="flex justify-between text-xs text-slate-500 mt-2 font-mono">
+        <span>82.98% Residential</span>
+        <span>11.74% Commercial</span>
+        <span>5.28% Multi-Family</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANEL 2: BEFORE / AFTER -->
+  <section id="enrichment">
+    <div class="flex items-end justify-between mb-4">
+      <div>
+        <h2 class="text-2xl font-bold text-navy">Permit Enrichment — Raw → Branded</h2>
+        <p class="text-sm text-slate-500 mt-1 max-w-2xl">Every state permit feed is transformed into a branded, SEO-ready project page. Same data — but visible, searchable, and pitch-ready.</p>
+      </div>
+      <span class="pill">5 of 758 shown</span>
+    </div>
+
+    <div class="card overflow-hidden">
+      <div class="grid grid-cols-12 bg-slate-50 border-b border-slate-200 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <div class="col-span-5">Raw Permit Feed</div>
+        <div class="col-span-2 text-center">Enrichment</div>
+        <div class="col-span-5">Public-Facing Project Page</div>
+      </div>
+
+      <!-- PROJECT 1: Commonbond -->
+      <div class="grid grid-cols-12 gap-4 px-5 py-6 border-b border-slate-100">
+        <div class="col-span-12 lg:col-span-5">
+          <div class="raw-card"><span class="k">permit_id:</span> ELE2508-09341
+<span class="k">applicant:</span> J BECHER &amp; ASSOC INC
+<span class="k">gc:</span> COMMONBOND COMMUNITIES
+<span class="k">site:</span> 14290 60TH ST N
+<span class="k">city:</span> OAK PARK HEIGHTS
+<span class="k">county:</span> WASHINGTON
+<span class="k">type:</span> RES-MULTI
+<span class="k">scope:</span> 120 UNIT APT/TWNHM REMODEL
+<span class="k">fee:</span> $10,386.00
+<span class="k">filed:</span> 2025-08-14</div>
+        </div>
+        <div class="col-span-12 lg:col-span-2 arrow-col py-6"></div>
+        <div class="col-span-12 lg:col-span-5">
+          <div class="enriched-card">
+            <div class="flex flex-wrap gap-1.5 mb-2">
+              <span class="tag">Multifamily</span>
+              <span class="tag tag-blue">Remodel</span>
+              <span class="tag tag-slate">120 Units</span>
+              <span class="tag tag-green">Affordable Housing</span>
+            </div>
+            <div class="seo-headline">120-Unit CommonBond Remodel — Oak Park Heights</div>
+            <p class="seo-body">
+              J Becher &amp; Associates is providing electrical contracting for the 120-unit apartment and townhome remodel for CommonBond Communities in Oak Park Heights, Washington County. The project covers full electrical scope across the multifamily site, including unit-level service updates, common-area lighting, and code-required upgrades tied to the rehabilitation of an affordable housing community. As an IBEW Local 292 signatory contractor, J Becher brings union-trained journeymen and a long track record of multifamily work in the east metro to this scope.
+            </p>
+            <div class="ad-preview">
+              <div class="ad-label">Search Ad Preview</div>
+              <div class="ad-title">Multifamily Electrical Contractor — Oak Park Heights | J Becher</div>
+              <div class="ad-desc">IBEW Local 292 contractor delivering full electrical scope for 120-unit affordable housing remodels in Washington County.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECT 2: Artspace -->
+      <div class="grid grid-cols-12 gap-4 px-5 py-6 border-b border-slate-100">
+        <div class="col-span-12 lg:col-span-5">
+          <div class="raw-card"><span class="k">permit_id:</span> ELE2601-04681
+<span class="k">applicant:</span> J BECHER &amp; ASSOC INC
+<span class="k">gc:</span> ARTSPACE PROJECTS INC
+<span class="k">site:</span> 711 W BROADWAY AVE
+<span class="k">city:</span> MINNEAPOLIS
+<span class="k">county:</span> HENNEPIN
+<span class="k">type:</span> RES-MULTI
+<span class="k">scope:</span> 84 UNIT APARTMENT BLDG
+<span class="k">fee:</span> $4,913.00
+<span class="k">filed:</span> 2026-01-22</div>
+        </div>
+        <div class="col-span-12 lg:col-span-2 arrow-col py-6"></div>
+        <div class="col-span-12 lg:col-span-5">
+          <div class="enriched-card">
+            <div class="flex flex-wrap gap-1.5 mb-2">
+              <span class="tag">Multifamily</span>
+              <span class="tag tag-blue">New Construction</span>
+              <span class="tag tag-slate">84 Units</span>
+              <span class="tag tag-green">Arts &amp; Culture</span>
+            </div>
+            <div class="seo-headline">84-Unit Artspace Apartment — North Minneapolis</div>
+            <p class="seo-body">
+              J Becher &amp; Associates is the electrical contractor of record for the 84-unit Artspace Projects apartment building on West Broadway in Minneapolis, Hennepin County. The scope covers full electrical for a ground-up multifamily build — service entrance, in-unit rough and finish, common areas, and life-safety systems for a mixed-use arts-focused residential community. The project continues J Becher's long-standing partnership with Artspace and reflects the firm's IBEW Local 292 commitment to delivering union-built housing across the Twin Cities core.
+            </p>
+            <div class="ad-preview">
+              <div class="ad-label">Search Ad Preview</div>
+              <div class="ad-title">Apartment Electrical Contractor — Minneapolis | J Becher &amp; Associates</div>
+              <div class="ad-desc">IBEW Local 292 contractor delivering full-scope electrical for ground-up multifamily projects in Hennepin County.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECT 3: Hilltop Manor -->
+      <div class="grid grid-cols-12 gap-4 px-5 py-6 border-b border-slate-100">
+        <div class="col-span-12 lg:col-span-5">
+          <div class="raw-card"><span class="k">permit_id:</span> ELE2605-00841
+<span class="k">applicant:</span> J BECHER &amp; ASSOC INC
+<span class="k">gc:</span> HILLTOP MANOR LIMITED
+<span class="k">site:</span> 600 PIERCE ST
+<span class="k">city:</span> EVELETH
+<span class="k">county:</span> ST LOUIS
+<span class="k">type:</span> RES-MULTI
+<span class="k">scope:</span> 54 UNIT APARTMENT REMODEL
+<span class="k">fee:</span> $2,015.00
+<span class="k">filed:</span> 2026-05-08</div>
+        </div>
+        <div class="col-span-12 lg:col-span-2 arrow-col py-6"></div>
+        <div class="col-span-12 lg:col-span-5">
+          <div class="enriched-card">
+            <div class="flex flex-wrap gap-1.5 mb-2">
+              <span class="tag">Multifamily</span>
+              <span class="tag tag-blue">Remodel</span>
+              <span class="tag tag-slate">54 Units</span>
+              <span class="tag tag-green">Iron Range</span>
+            </div>
+            <div class="seo-headline">54-Unit Hilltop Manor Remodel — Eveleth</div>
+            <p class="seo-body">
+              J Becher &amp; Associates is providing electrical services for the 54-unit Hilltop Manor apartment remodel in Eveleth, St Louis County. The project covers electrical scope tied to the rehabilitation of an existing multifamily building on Minnesota's Iron Range, including unit-level upgrades and common-area systems. As an IBEW Local 292 signatory firm, J Becher continues to extend its Twin Cities multifamily expertise to greater Minnesota communities while keeping the work in union hands.
+            </p>
+            <div class="ad-preview">
+              <div class="ad-label">Search Ad Preview</div>
+              <div class="ad-title">Multifamily Remodel Electrical — Eveleth, MN | J Becher</div>
+              <div class="ad-desc">IBEW Local 292 contractor serving St Louis County multifamily remodels with full electrical scope.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECT 4: Catholic Eldercare -->
+      <div class="grid grid-cols-12 gap-4 px-5 py-6 border-b border-slate-100">
+        <div class="col-span-12 lg:col-span-5">
+          <div class="raw-card"><span class="k">permit_id:</span> ELE2506-05280
+<span class="k">applicant:</span> J BECHER &amp; ASSOC INC
+<span class="k">gc:</span> CATHOLIC ELDERCARE
+<span class="k">site:</span> 817 MAIN ST NE
+<span class="k">city:</span> MINNEAPOLIS
+<span class="k">county:</span> HENNEPIN
+<span class="k">type:</span> COMMERCIAL
+<span class="k">scope:</span> NURSING HOME REMODEL
+<span class="k">fee:</span> $2,001.00
+<span class="k">filed:</span> 2025-06-19</div>
+        </div>
+        <div class="col-span-12 lg:col-span-2 arrow-col py-6"></div>
+        <div class="col-span-12 lg:col-span-5">
+          <div class="enriched-card">
+            <div class="flex flex-wrap gap-1.5 mb-2">
+              <span class="tag">Healthcare</span>
+              <span class="tag tag-blue">Remodel</span>
+              <span class="tag tag-slate">Senior Living</span>
+              <span class="tag tag-green">Life-Safety</span>
+            </div>
+            <div class="seo-headline">Catholic Eldercare Nursing Home Remodel — NE Minneapolis</div>
+            <p class="seo-body">
+              J Becher &amp; Associates is delivering electrical scope for the Catholic Eldercare nursing home remodel on Main Street NE in Minneapolis, Hennepin County. Senior care facilities require strict adherence to life-safety, emergency power, and code-compliant patient-room electrical — work where J Becher's IBEW Local 292 journeymen bring depth of experience. The scope supports a continuing-care community that has served NE Minneapolis residents for decades.
+            </p>
+            <div class="ad-preview">
+              <div class="ad-label">Search Ad Preview</div>
+              <div class="ad-title">Senior Living Electrical Contractor — Minneapolis | J Becher</div>
+              <div class="ad-desc">IBEW Local 292 contractor for nursing home and senior living electrical remodels in Hennepin County.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECT 5: Frerichs Construction -->
+      <div class="grid grid-cols-12 gap-4 px-5 py-6">
+        <div class="col-span-12 lg:col-span-5">
+          <div class="raw-card"><span class="k">permit_id:</span> ELE2603-02783
+<span class="k">applicant:</span> J BECHER &amp; ASSOC INC
+<span class="k">gc:</span> FRERICHS CONSTRUCTION
+<span class="k">site:</span> 2929 UNIVERSITY AVE SE
+<span class="k">city:</span> MINNEAPOLIS
+<span class="k">county:</span> HENNEPIN
+<span class="k">type:</span> RES-MULTI
+<span class="k">scope:</span> 10 UNIT TOWNHOME, 800A METER BANK
+<span class="k">fee:</span> $1,282.00
+<span class="k">filed:</span> 2026-03-04</div>
+        </div>
+        <div class="col-span-12 lg:col-span-2 arrow-col py-6"></div>
+        <div class="col-span-12 lg:col-span-5">
+          <div class="enriched-card">
+            <div class="flex flex-wrap gap-1.5 mb-2">
+              <span class="tag">Multifamily</span>
+              <span class="tag tag-blue">New Construction</span>
+              <span class="tag tag-slate">Service Upgrade</span>
+              <span class="tag tag-green">800A Meter Bank</span>
+            </div>
+            <div class="seo-headline">10-Unit Townhome with 800A Service — Frerichs Construction</div>
+            <p class="seo-body">
+              J Becher &amp; Associates is providing full electrical scope for a 10-unit townhome project for Frerichs Construction on University Avenue SE in Minneapolis, Hennepin County. The project includes an 800 amp meter bank to support metered service for all ten units along with site, unit, and common-area electrical. Service-entrance work at this scale is a J Becher specialty, and the firm's IBEW Local 292 crews deliver the kind of coordinated rough-in and inspection turnaround that keeps multifamily builds on schedule.
+            </p>
+            <div class="ad-preview">
+              <div class="ad-label">Search Ad Preview</div>
+              <div class="ad-title">Townhome Electrical &amp; Service Upgrades — Minneapolis | J Becher</div>
+              <div class="ad-desc">IBEW Local 292 contractor for 10-unit townhomes, 800A meter banks, and service entrance work in Hennepin County.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOWER GRID: GC RELATIONSHIPS + SECTORS -->
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- PANEL 3: GC RELATIONSHIPS -->
+    <div id="relationships" class="card p-6">
+      <div class="flex items-end justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-navy">GC Relationship Map</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Top general contractor partners by permit volume.</p>
+        </div>
+        <span class="pill">Top 8</span>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-sm mb-1.5">
+            <span class="font-medium text-navy">Progressive Builders</span>
+            <span class="font-mono text-slate-500">72</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm mb-1.5">
+            <span class="font-medium text-navy">Lennar Homes</span>
+            <span class="font-mono text-slate-500">28</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:38.9%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm mb-1.5">
+            <span class="font-medium text-navy">Frontier Homes</span>
+            <span class="font-mono text-slate-500">28</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:38.9%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm mb-1.5">
+            <span class="font-medium text-navy">SW Wold Construction</span>
+            <span class="font-mono text-slate-500">18</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:25%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm mb-1.5">
+            <span class="font-medium text-navy">CB South Haven</span>
+            <span class="font-mono text-slate-500">12</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:16.7%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm mb-1.5">
+            <span class="font-medium text-navy">Loomis Homes</span>
+            <span class="font-mono text-slate-500">9</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:12.5%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm mb-1.5">
+            <span class="font-medium text-navy">Terrace Companies</span>
+            <span class="font-mono text-slate-500">7</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:9.7%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm mb-1.5">
+            <span class="font-medium text-navy">Novak Builders</span>
+            <span class="font-mono text-slate-500">6</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:8.3%"></div></div>
+        </div>
+      </div>
+
+      <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <span>180 permits across top 8 GCs</span>
+        <span class="font-mono">23.7% of total volume</span>
+      </div>
+    </div>
+
+    <!-- PANEL 4: SECTOR BREAKDOWN -->
+    <div id="sectors" class="card p-6">
+      <div class="flex items-end justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-navy">Sector Breakdown</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Distribution of 758 permits by project sector.</p>
+        </div>
+        <span class="pill">FY 2025–26</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+        <div style="height: 220px;">
+          <canvas id="sectorChart"></canvas>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between p-2.5 rounded-md hover:bg-slate-50">
+            <div class="flex items-center gap-2 text-sm">
+              <span class="legend-dot" style="background:#E86C1B"></span>
+              <span class="font-medium text-navy">One-Family</span>
+            </div>
+            <span class="font-mono text-sm text-slate-700">629 <span class="text-slate-400">·</span> 82.98%</span>
+          </div>
+          <div class="flex items-center justify-between p-2.5 rounded-md hover:bg-slate-50">
+            <div class="flex items-center gap-2 text-sm">
+              <span class="legend-dot" style="background:#1E3A8A"></span>
+              <span class="font-medium text-navy">Commercial</span>
+            </div>
+            <span class="font-mono text-sm text-slate-700">89 <span class="text-slate-400">·</span> 11.74%</span>
+          </div>
+          <div class="flex items-center justify-between p-2.5 rounded-md hover:bg-slate-50">
+            <div class="flex items-center gap-2 text-sm">
+              <span class="legend-dot" style="background:#0EA5A0"></span>
+              <span class="font-medium text-navy">Multi-Family</span>
+            </div>
+            <span class="font-mono text-sm text-slate-700">40 <span class="text-slate-400">·</span> 5.28%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 pt-4 border-t border-slate-100">
+        <div class="flex items-center justify-between bg-orange-50 border border-orange-200 rounded-lg px-4 py-3" style="background:#FBE7D6; border-color:#F0C09C;">
+          <div>
+            <div class="text-xs font-semibold text-orange uppercase tracking-wider">Capability Spotlight</div>
+            <div class="text-sm font-medium text-navy mt-1">EV Charger Installations</div>
+            <div class="text-xs text-slate-600 mt-0.5">Level 2 + DCFC across residential, commercial, and multifamily.</div>
+          </div>
+          <div class="text-3xl font-bold text-orange font-mono">213</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANEL 5: GEOGRAPHIC COVERAGE -->
+  <section id="geo" class="card p-6">
+    <div class="flex items-end justify-between mb-4">
+      <div>
+        <h2 class="text-lg font-bold text-navy">Geographic Coverage</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Top 10 Minnesota counties by permit volume — 670 of 758 permits filed.</p>
+      </div>
+      <span class="pill">33 counties served</span>
+    </div>
+    <div style="height: 300px;">
+      <canvas id="countyChart"></canvas>
+    </div>
+  </section>
+
+  <!-- FOOTER NOTE -->
+  <footer class="pt-4 pb-12 text-xs text-slate-500 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <span class="font-semibold text-slate-700">J Becher &amp; Associates</span>
+      <span class="mx-2">·</span>
+      IBEW Local 292 Signatory Electrical Contractor
+      <span class="mx-2">·</span>
+      Twin Cities, MN
+    </div>
+    <div>
+      Portal built &amp; maintained by
+      <a href="https://emendesign.com" class="text-orange font-semibold hover:underline">eMen Design</a>
+    </div>
+  </footer>
+</main>
+
+<script>
+  // Sector donut
+  new Chart(document.getElementById('sectorChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['One-Family', 'Commercial', 'Multi-Family'],
+      datasets: [{
+        data: [629, 89, 40],
+        backgroundColor: ['#E86C1B', '#1E3A8A', '#0EA5A0'],
+        borderColor: '#fff',
+        borderWidth: 3,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ` ${ctx.label}: ${ctx.parsed} permits`
+          }
+        }
+      }
+    }
+  });
+
+  // County bar
+  new Chart(document.getElementById('countyChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Hennepin','Wright','Anoka','Carver','Sherburne','Stearns','Dakota','Chisago','Scott','Benton'],
+      datasets: [{
+        label: 'Permits',
+        data: [274,106,57,50,47,45,30,21,20,20],
+        backgroundColor: '#E86C1B',
+        borderRadius: 6,
+        maxBarThickness: 42
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: { label: (ctx) => ` ${ctx.parsed.y} permits` }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#475569', font: { weight: 600 } } },
+        y: { beginAtZero: true, grid: { color: '#EEF1F5' }, ticks: { color: '#64748B' } }
+      }
+    }
+  });
+</script>
+</body>
+</html>
